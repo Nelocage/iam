@@ -3,7 +3,7 @@ RUN sed -e 's|^mirrorlist=|#mirrorlist=|g' \
     -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.aliyun.com/rockylinux|g' \
     -i.bak \
     /etc/yum.repos.d/Rocky-*.repo
-RUN  dnf makecache && dnf update -y &&dnf  -y install vim  sudo wget 
+RUN  dnf makecache &&dnf  -y install vim  sudo wget
 RUN dnf group install -y  "Development Tools"
 RUN useradd -ms /bin/bash going
 RUN echo 'going:iam59!z$' |chpasswd

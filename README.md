@@ -102,11 +102,13 @@ IAM is licensed under the MIT. See [LICENSE](LICENSE) for the full license text.
 
 
 ```shell
-docker build --rm  -t study:v2 .   
+docker build --rm  -t iam:v1.6.2 .   
 
-docker run -tid --name iam --privileged=true study:v2 /usr/sbin/init  -t study:v2 .
+docker run -tid --name iam --privileged=true iam:v1.6.2 /usr/sbin/init  -t iam:v1.6.2 .
 
 docker exec -it iam   bash
+
+ cd /iam/ && ./scripts/install/install.sh iam::install::install
 ```
 
 `--privileged=true`必须要加这个，否则在把用户添加到sudoer中报错,`sudo`也是个软件也需要进行安装，docker默认不启动`systemd`

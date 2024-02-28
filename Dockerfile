@@ -14,7 +14,8 @@ COPY . /iam
 EXPOSE 3306
 EXPOSE 27017
 EXPOSE 6379
-CMD [ "/bin/bash" ]    #docker run -dit  --name  xxx  xx 需要这么执行命令才可以
+#docker run -dit  --name  xxx  xx 需要这么执行命令才可以
+CMD [ "/bin/bash" ]
 
 
 

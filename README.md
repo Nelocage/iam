@@ -92,3 +92,21 @@ You are encouraged to communicate most things via [GitHub issues](https://github
 ## 许可证
 
 IAM is licensed under the MIT. See [LICENSE](LICENSE) for the full license text.
+
+
+
+## nelocage学习
+
+
+使用docker对该项目进行一键部署
+
+
+```shell
+docker build --rm  -t study:v2 .   
+
+docker run -tid --name iam --privileged=true study:v2 /usr/sbin/init  -t study:v2 .
+
+docker exec -it iam   bash
+```
+
+`--privileged=true`必须要加这个，否则在把用户添加到sudoer中报错,`sudo`也是个软件也需要进行安装，docker默认不启动`systemd`

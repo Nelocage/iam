@@ -23,18 +23,6 @@ source ${IAM_ROOT}/scripts/install/test.sh
 # 申请服务器，登录 going 用户后，配置 $HOME/.bashrc 文件
 iam::install::prepare_linux()
 {
-  # 1. 替换 Yum 源为阿里的 Yum 源
-  iam::common::sudo "mv /etc/yum.repos.d /etc/yum.repos.d.$$.bak" # 先备份原有的 Yum 源
-  iam::common::sudo "mkdir /etc/yum.repos.d"
-  iam::common::sudo "wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-vault-8.5.2111.repo"
-  iam::common::sudo "yum clean all"
-  iam::common::sudo "yum makecache"
-
-
-  if [[ -f $HOME/.bashrc ]];then
-    cp $HOME/.bashrc $HOME/bashrc.iam.backup
-  fi
-
   # 2. 配置 $HOME/.bashrc
   cat << 'EOF' > $HOME/.bashrc
 # .bashrc
@@ -68,27 +56,7 @@ cd $WORKSPACE # 登录系统，默认进入 workspace 目录
 EOF
 
   # 3. 安装依赖包
-  iam::common::sudo "yum -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet lrzsz jq expat-devel openssl-devel"
-
-  # 4. 安装 Git
-  rm -rf /tmp/git-2.36.1.tar.gz /tmp/git-2.36.1 # clean up
-  cd /tmp
-  wget --no-check-certificate https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.36.1.tar.gz
-  tar -xvzf git-2.36.1.tar.gz
-  cd git-2.36.1/
-  ./configure
-  make
-  iam::common::sudo "make install"
-
-  cat << 'EOF' >> $HOME/.bashrc
-# Configure for git
-export PATH=/usr/local/libexec/git-core:$PATH
-EOF
-
-  git --version | grep -q 'git version 2.36.1' || {
-    iam::log::error "git version is not '2.36.1', maynot install git properly"
-    return 1
-  }
+  iam::common::sudo "dnf -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet lrzsz jq expat-devel openssl-devel git go protobuf"
 
   # 5. 配置 Git
   git config --global user.name "Lingfei Kong"    # 用户名改成自己的
@@ -97,7 +65,6 @@ EOF
   git config --global core.longpaths true # 解决 Git 中 'Filename too long' 的错误
   git config --global core.quotepath off
   git lfs install --skip-repo
-
   source $HOME/.bashrc
   iam::log::info "prepare linux basic environment successfully"
 }
@@ -120,63 +87,20 @@ function iam::install::init_into_go_env()
 # Go 编译环境安装和配置
 function iam::install::go_command()
 {
-  rm -rf /tmp/go1.18.3.linux-amd64.tar.gz $HOME/go/go1.18.3 # clean up
-
-  # 1. 下载 go1.18.3 版本的 Go 安装包
-  wget -P /tmp/ https://golang.google.cn/dl/go1.18.3.linux-amd64.tar.gz
-
-  # 2. 安装 Go
-  mkdir -p $HOME/go
-  tar -xvzf /tmp/go1.18.3.linux-amd64.tar.gz -C $HOME/go
-  mv $HOME/go/go $HOME/go/go1.18.3
-
   # 3. 配置 Go 环境变量
   cat << 'EOF' >> $HOME/.bashrc
 # Go envs
-export GOVERSION=go1.18.3 # Go 版本设置
-export GO_INSTALL_DIR=$HOME/go # Go 安装目录
-export GOROOT=$GO_INSTALL_DIR/$GOVERSION # GOROOT 设置
-export GOPATH=$WORKSPACE/golang # GOPATH 设置
-export PATH=$GOROOT/bin:$GOPATH/bin:$PATH # 将 Go 语言自带的和通过 go install 安装的二进制文件加入到 PATH 路径中
 export GO111MODULE="on" # 开启 Go moudles 特性
 export GOPROXY=https://goproxy.cn,direct # 安装 Go 模块时，代理服务器设置
 export GOPRIVATE=
 export GOSUMDB=off # 关闭校验 Go 依赖包的哈希值
 EOF
   source $HOME/.bashrc
-
-  # 4. 初始化 Go 工作区
-  mkdir -p $GOPATH && cd $GOPATH
-  go work init
-
   iam::log::info "install go compile tool successfully"
 }
 
 function iam::install::protobuf()
 {
-  # 检查 protoc、protoc-gen-go 是否安装
-  command -v protoc &>/dev/null && command -v protoc-gen-go &>/dev/null && return 0
-
-  rm -rf /tmp/protobuf # clean up
-
-  # 1. 安装 protobuf
-  cd /tmp/
-  git clone -b v3.21.1 --depth=1 https://github.com/protocolbuffers/protobuf
-  cd protobuf
-  libtoolize --automake --copy --debug --force
-  ./autogen.sh
-  ./configure
-  make
-  sudo make install
-  iam::common::sudo "make install"
-  protoc --version | grep -q 'libprotoc 3.21.1' || {
-    iam::log::error "protoc version is not '3.21.1', maynot install protobuf properly"
-    return 1
-  }
-
-  iam::log::info "install protoc tool successfully"
-
-
   # 2. 安装 protoc-gen-go
   go install github.com/golang/protobuf/protoc-gen-go@v1.5.2
 
@@ -219,15 +143,18 @@ function iam::install::obtain_branch_flag(){
 
 function iam::install::prepare_iam()
 {
-  rm -rf $WORKSPACE/golang/src/github.com/marmotedu/iam # clean up
+  # rm -rf $WORKSPACE/golang/src/github.com/marmotedu/iam 
+  # rm -rf $WORKSPACE/iam # clean up
 
   # 1. 下载 iam 项目代码，先强制删除 iam 目录，确保 iam 源码都是最新的指定版本
-  mkdir -p $WORKSPACE/golang/src/github.com/marmotedu && cd $WORKSPACE/golang/src/github.com/marmotedu
-  git clone -b $(iam::install::obtain_branch_flag) --depth=1 https://github.com/marmotedu/iam
-  go work use ./iam
+  # mkdir -p $WORKSPACE/golang/src/github.com/marmotedu && cd $WORKSPACE/golang/src/github.com/marmotedu
+  # git clone -b $(iam::install::obtain_branch_flag) --depth=1 https://github.com/marmotedu/iam
+  # go work use ./iam
 
   # NOTICE: 因为切换编译路径，所以这里要重新赋值 IAM_ROOT 和 LOCAL_OUTPUT_ROOT
-  IAM_ROOT=$WORKSPACE/golang/src/github.com/marmotedu/iam
+  # IAM_ROOT=$WORKSPACE/golang/src/github.com/marmotedu/iam
+
+  IAM_ROOT=/iam
   LOCAL_OUTPUT_ROOT="${IAM_ROOT}/${OUT_DIR:-_output}"
 
   pushd ${IAM_ROOT}

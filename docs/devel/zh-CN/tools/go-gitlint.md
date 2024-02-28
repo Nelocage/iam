@@ -3,7 +3,7 @@
 ## 安装
 
 ```bash
-$ go get github.com/marmotedu/go-gitlint/cmd/go-gitlint
+$ go install github.com/marmotedu/go-gitlint/cmd/go-gitlint
 ```
 
 ## 配置

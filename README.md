@@ -108,7 +108,7 @@ docker run -tid --name iam -p 3310:3306 -p 27020:27017 -p 6350:6379  --privilege
 
 docker exec -it iam   bash
 
- cd /iam/ && ./scripts/install/install.sh iam::install::install
+cd /iam/ && ./scripts/install/install.sh iam::install::install
 ```
 
 因为安全性原因，mysql MongoDB redis都是禁止远程访问的

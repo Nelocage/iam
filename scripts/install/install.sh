@@ -163,10 +163,10 @@ function iam::install::prepare_iam()
   if ! grep -q 'Alias for quick access' $HOME/.bashrc;then
     cat << 'EOF' >> $HOME/.bashrc
 # Alias for quick access
-export GOSRC="$WORKSPACE/golang/src"
-export IAM_ROOT="$GOSRC/github.com/marmotedu/iam"
-alias mm="cd $GOSRC/github.com/marmotedu"
-alias i="cd $GOSRC/github.com/marmotedu/iam"
+#export GOSRC="$WORKSPACE/golang/src"
+export IAM_ROOT="/iam"
+#alias mm="cd $GOSRC/github.com/marmotedu"
+alias i="cd /iam"
 EOF
   fi
 

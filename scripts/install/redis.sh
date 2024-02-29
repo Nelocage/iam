@@ -39,8 +39,12 @@ function iam::redis::install()
   iam::common::sudo "systemctl stop firewalld.service"
   iam::common::sudo "systemctl disable firewalld.service"
 
-  # 4. 启动 Redis
-  iam::common::sudo "redis-server /etc/redis.conf"
+  # 4. 启动 Redis 并设置开机启动
+#  iam::common::sudo "redis-server /etc/redis.conf"
+  iam::common::sudo "systemctl enable redis"
+  iam::common::sudo "systemctl start redis"
+  iam::common::sudo "sudo chmod 777 /var/log/redis/redis.log "
+
 
   iam::redis::status || return 1
   iam::redis::info

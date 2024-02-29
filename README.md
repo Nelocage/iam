@@ -111,4 +111,19 @@ docker exec -it iam   bash
  cd /iam/ && ./scripts/install/install.sh iam::install::install
 ```
 
+因为安全性原因，mysql MongoDB redis都是禁止远程访问的
+如果需要远程访问，需要进行设置
+```shell
+mysql -u root -p  #随后需要输入密码 iam59!z$
+grant all privileges on *.* to root@"%" identified by "iam59!z$" with grant option;
+flush privileges;
+```
+
+```shell
+systemctl status mongod
+systemctl status mariadb
+systemctl status redis
+
+```
+
 `--privileged=true`必须要加这个，否则在把用户添加到sudoer中报错,`sudo`也是个软件也需要进行安装，docker默认不启动`systemd`

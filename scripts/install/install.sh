@@ -56,7 +56,7 @@ cd $WORKSPACE # 登录系统，默认进入 workspace 目录
 EOF
 
   # 3. 安装依赖包
-  iam::common::sudo "dnf -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet lrzsz jq expat-devel openssl-devel git go protobuf"
+  iam::common::sudo "dnf -y install make autoconf automake cmake perl-CPAN libcurl-devel libtool gcc gcc-c++ glibc-headers zlib-devel git-lfs telnet lrzsz jq expat-devel openssl-devel git go protobuf man"
 
   # 5. 配置 Git
   git config --global user.name "Lingfei Kong"    # 用户名改成自己的
@@ -270,7 +270,7 @@ function iam::install::install_iam()
 
   # 8. 安装 man page
   iam::man::install || return 1
-
+  source $HOME/.bashrc
   iam::log::info "install iam application successfully"
 }
 

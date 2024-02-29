@@ -27,7 +27,8 @@ function iam::redis::install()
   echo ${LINUX_PASSWORD} | sudo -S sed -i '/^daemonize/{s/no/yes/}' /etc/redis.conf
 
   # 2.2 在 `bind 127.0.0.1` 前面添加 `#` 将其注释掉，默认情况下只允许本地连接，注释掉后外网可以连接 Redis
-  echo ${LINUX_PASSWORD} | sudo -S sed -i '/^# bind 127.0.0.1/{s/# //}' /etc/redis.conf
+#  echo ${LINUX_PASSWORD} | sudo -S sed -i '/^# bind 127.0.0.1/{s/# //}' /etc/redis.conf
+echo ${LINUX_PASSWORD} | sudo -S sed -i '/^bind 127.0.0.1/s/^/# /' /etc/redis.conf
 
   # 2.3 修改 requirepass 配置，设置 Redis 密码
   echo ${LINUX_PASSWORD} | sudo -S sed -i 's/^# requirepass.*$/requirepass '"${REDIS_PASSWORD}"'/' /etc/redis.conf

@@ -41,6 +41,7 @@ EOF"
 
   # 4. 设置 root 初始密码
   iam::common::sudo "mysqladmin -u${MARIADB_ADMIN_USERNAME} password ${MARIADB_ADMIN_PASSWORD}"
+  echo ${LINUX_PASSWORD} | sudo -S sed -i 's/#bind-address=0.0.0.0/bind-address=0.0.0.0/' /etc/my.cnf.d/server.cnf
 
   iam::mariadb::status || return 1
   iam::mariadb::info

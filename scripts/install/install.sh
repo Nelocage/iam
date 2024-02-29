@@ -161,26 +161,18 @@ EOF
   # 3.1 登录数据库并创建 iam 用户
   #这条命令是用于授权的，它允许用户`${MARIADB_USERNAME}`在本地主机（127.0.0.1）上访问`iam`数据库的所有权限，
   # 并使用密码`${MARIADB_PASSWORD}`进行身份验证。
-#  grant all on iam.* TO ${MARIADB_USERNAME}@127.0.0.1 identified by "${MARIADB_PASSWORD}";
-#  mysql -h127.0.0.1 -P3306 -u"${MARIADB_ADMIN_USERNAME}" -p"${MARIADB_ADMIN_PASSWORD}" << EOF
-#grant all on iam.* TO ${MARIADB_USERNAME}@"%" identified by "${MARIADB_PASSWORD}";
-#flush privileges;
-#EOF
-
-  mysql  -P3306 -u"${MARIADB_ADMIN_USERNAME}" -p"${MARIADB_ADMIN_PASSWORD}" << EOF
-grant all on iam.* TO ${MARIADB_USERNAME}@"%" identified by "${MARIADB_PASSWORD}";
+  mysql -h127.0.0.1 -P3306 -u"${MARIADB_ADMIN_USERNAME}" -p"${MARIADB_ADMIN_PASSWORD}" << EOF
+grant all on iam.* TO ${MARIADB_USERNAME}@127.0.0.1 identified by "${MARIADB_PASSWORD}";
 flush privileges;
 EOF
 
+
   # 3.2 用 iam 用户登录 mysql，执行 iam.sql 文件，创建 iam 数据库
-#  mysql -h127.0.0.1 -P3306 -u${MARIADB_USERNAME} -p"${MARIADB_PASSWORD}" << EOF
-#source configs/iam.sql;
-#show databases;
-#EOF
-  mysql  -P3306 -u${MARIADB_USERNAME} -p"${MARIADB_PASSWORD}" << EOF
+  mysql -h127.0.0.1 -P3306 -u${MARIADB_USERNAME} -p"${MARIADB_PASSWORD}" << EOF
 source configs/iam.sql;
 show databases;
 EOF
+
 
 
   # 4. 创建必要的目录

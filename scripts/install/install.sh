@@ -163,6 +163,7 @@ EOF
   # 并使用密码`${MARIADB_PASSWORD}`进行身份验证。
   mysql -h127.0.0.1 -P3306 -u"${MARIADB_ADMIN_USERNAME}" -p"${MARIADB_ADMIN_PASSWORD}" << EOF
 grant all on iam.* TO ${MARIADB_USERNAME}@127.0.0.1 identified by "${MARIADB_PASSWORD}";
+grant all on iam.* TO ${MARIADB_ADMIN_USERNAME}@"%" identified by "${MARIADB_ADMIN_PASSWORD}";
 flush privileges;
 EOF
 
